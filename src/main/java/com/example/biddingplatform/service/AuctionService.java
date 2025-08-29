@@ -8,6 +8,7 @@ import com.example.biddingplatform.mapper.AuctionMapper;
 import com.example.biddingplatform.repository.AuctionRepository;
 import com.example.biddingplatform.repository.BidRepository;
 import com.example.biddingplatform.repository.WatchlistRepository;
+import com.example.biddingplatform.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -23,24 +24,29 @@ public class AuctionService {
     private final BidRepository bidRepository;
     private final WatchlistRepository watchlistRepository;
     private final AuctionMapper auctionMapper;
+    private final UserRepository userRepository;
 
     public AuctionService(AuctionRepository auctionRepository,
                           BidRepository bidRepository,
                           WatchlistRepository watchlistRepository,
-                          AuctionMapper auctionMapper) {
+                          AuctionMapper auctionMapper,
+                          UserRepository userRepository) {
         this.auctionRepository = auctionRepository;
         this.bidRepository = bidRepository;
         this.watchlistRepository = watchlistRepository;
         this.auctionMapper = auctionMapper;
+        this.userRepository = userRepository;
     }
 
-    public List<AuctionSummaryDto> getAuctions(Long userId) {
+    public List<AuctionSummaryDto> getAuctions(String username) {
+        Long userId = userRepository.findByUsername(username).orElseThrow().getId();
         return auctionRepository.findAll().stream()
                 .map(a -> auctionMapper.toSummaryDto(a, watchlistRepository.existsByUserIdAndAuctionId(userId, a.getId())))
                 .collect(Collectors.toList());
     }
 
-    public Optional<AuctionDetailDto> getAuction(Long id, Long userId) {
+    public Optional<AuctionDetailDto> getAuction(Long id, String username) {
+        Long userId = userRepository.findByUsername(username).orElseThrow().getId();
         return auctionRepository.findById(id)
                 .map(a -> auctionMapper.toDetailDto(a, watchlistRepository.existsByUserIdAndAuctionId(userId, a.getId())));
     }
@@ -72,7 +78,8 @@ public class AuctionService {
     }
 
     @Transactional
-    public boolean updateWatchlist(Long auctionId, WatchlistActionRequest request, Long userId) {
+    public boolean updateWatchlist(Long auctionId, WatchlistActionRequest request, String username) {
+        Long userId = userRepository.findByUsername(username).orElseThrow().getId();
         if ("add".equalsIgnoreCase(request.action())) {
             if (watchlistRepository.existsByUserIdAndAuctionId(userId, auctionId)) {
                 return true;

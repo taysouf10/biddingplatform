@@ -6,6 +6,7 @@ import com.example.biddingplatform.mapper.AuctionMapper;
 import com.example.biddingplatform.repository.AuctionRepository;
 import com.example.biddingplatform.repository.BidRepository;
 import com.example.biddingplatform.repository.WatchlistRepository;
+import com.example.biddingplatform.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,18 +18,22 @@ public class UserService {
     private final AuctionRepository auctionRepository;
     private final BidRepository bidRepository;
     private final AuctionMapper auctionMapper;
+    private final UserRepository userRepository;
 
     public UserService(WatchlistRepository watchlistRepository,
                        AuctionRepository auctionRepository,
                        BidRepository bidRepository,
-                       AuctionMapper auctionMapper) {
+                       AuctionMapper auctionMapper,
+                       UserRepository userRepository) {
         this.watchlistRepository = watchlistRepository;
         this.auctionRepository = auctionRepository;
         this.bidRepository = bidRepository;
         this.auctionMapper = auctionMapper;
+        this.userRepository = userRepository;
     }
 
-    public List<WatchlistItemDto> getWatchlist(Long userId) {
+    public List<WatchlistItemDto> getWatchlist(String username) {
+        Long userId = userRepository.findByUsername(username).orElseThrow().getId();
         return watchlistRepository.findByUserId(userId).stream().map(item -> {
             WatchlistItemDto dto = new WatchlistItemDto();
             dto.setAddedToWatchlist(item.getAddedAt());

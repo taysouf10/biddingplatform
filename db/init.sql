@@ -2,6 +2,7 @@
 CREATE SEQUENCE IF NOT EXISTS auction_id_seq START 1;
 CREATE SEQUENCE IF NOT EXISTS bid_id_seq START 1;
 CREATE SEQUENCE IF NOT EXISTS watchlist_item_id_seq START 1;
+CREATE SEQUENCE IF NOT EXISTS user_id_seq START 1;
 
 -- Tables
 CREATE TABLE IF NOT EXISTS auctions (
@@ -32,6 +33,13 @@ CREATE TABLE IF NOT EXISTS categories (
     name VARCHAR(255),
     icon VARCHAR(255),
     active_auctions INT
+);
+
+CREATE TABLE IF NOT EXISTS users (
+    id BIGINT PRIMARY KEY DEFAULT nextval('user_id_seq'),
+    username VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    role VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS watchlist_items (

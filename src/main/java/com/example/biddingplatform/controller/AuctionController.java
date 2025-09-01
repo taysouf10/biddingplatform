@@ -21,12 +21,14 @@ public class AuctionController {
 
     @GetMapping("/auctions")
     public ApiResponse<List<AuctionSummaryDto>> getAuctions(Authentication authentication) {
-        return new ApiResponse<>(true, auctionService.getAuctions(authentication.getName()), null);
+        String username = authentication != null ? authentication.getName() : null;
+        return new ApiResponse<>(true, auctionService.getAuctions(username), null);
     }
 
     @GetMapping("/auctions/{id}")
     public ResponseEntity<ApiResponse<AuctionDetailDto>> getAuction(@PathVariable Long id, Authentication authentication) {
-        return auctionService.getAuction(id, authentication.getName())
+        String username = authentication != null ? authentication.getName() : null;
+        return auctionService.getAuction(id, username)
                 .map(dto -> ResponseEntity.ok(new ApiResponse<>(true, dto, null)))
                 .orElse(ResponseEntity.notFound().build());
     }

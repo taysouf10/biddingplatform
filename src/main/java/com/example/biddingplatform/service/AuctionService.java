@@ -39,16 +39,30 @@ public class AuctionService {
     }
 
     public List<AuctionSummaryDto> getAuctions(String username) {
-        Long userId = userRepository.findByUsername(username).orElseThrow().getId();
+        Long userId = null;
+        if (username != null) {
+            userId = userRepository.findByUsername(username)
+                    .map(u -> u.getId())
+                    .orElse(null);
+        }
+        Long finalUserId = userId;
         return auctionRepository.findAll().stream()
-                .map(a -> auctionMapper.toSummaryDto(a, watchlistRepository.existsByUserIdAndAuctionId(userId, a.getId())))
+                .map(a -> auctionMapper.toSummaryDto(a,
+                        finalUserId != null && watchlistRepository.existsByUserIdAndAuctionId(finalUserId, a.getId())))
                 .collect(Collectors.toList());
     }
 
     public Optional<AuctionDetailDto> getAuction(Long id, String username) {
-        Long userId = userRepository.findByUsername(username).orElseThrow().getId();
+        Long userId = null;
+        if (username != null) {
+            userId = userRepository.findByUsername(username)
+                    .map(u -> u.getId())
+                    .orElse(null);
+        }
+        Long finalUserId = userId;
         return auctionRepository.findById(id)
-                .map(a -> auctionMapper.toDetailDto(a, watchlistRepository.existsByUserIdAndAuctionId(userId, a.getId())));
+                .map(a -> auctionMapper.toDetailDto(a,
+                        finalUserId != null && watchlistRepository.existsByUserIdAndAuctionId(finalUserId, a.getId())));
     }
 
     @Transactional

@@ -7,5 +7,6 @@ import java.util.List;
 
 public interface BidRepository extends JpaRepository<Bid, Long> {
     List<Bid> findByAuctionIdOrderByTimestampDesc(Long auctionId);
-    List<Bid> findByBidderName(String bidderName);
+
+    List<Bid> findByBidderNameOrderByTimestampDesc(String bidderName);
 }

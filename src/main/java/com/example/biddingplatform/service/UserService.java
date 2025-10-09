@@ -44,7 +44,7 @@ public class UserService {
     }
 
     public List<BidResponseDto> getBids(String bidderName) {
-        return bidRepository.findByBidderName(bidderName).stream().map(bid -> {
+        return bidRepository.findByBidderNameOrderByTimestampDesc(bidderName).stream().map(bid -> {
             BidResponseDto dto = new BidResponseDto();
             dto.setBidId(bid.getId());
             dto.setAuctionId(bid.getAuction().getId());
